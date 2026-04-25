@@ -43,8 +43,8 @@ def run_evaluation():
 
     # Two scenarios requested for evaluation comparison
     scenarios = {
-        "Balanced Traffic": (1.5, 1.5, 1.5, 1.5),         # Symmetrical load
-        "Asymmetric Traffic": (3.0, 3.0, 0.5, 0.5)        # Heavy N/S traffic, light E/W traffic
+        "Balanced Traffic": (0.4, 0.4, 0.4, 0.4),         # Symmetrical load
+        "Asymmetric Traffic": (0.8, 0.8, 0.1, 0.1)        # Heavy N/S traffic, light E/W traffic
     }
     
     results = {}

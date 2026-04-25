@@ -32,31 +32,6 @@ class IntersectionEnv:
         # Poisson arrivals for each branch per step
         arrivals = np.random.poisson(self.arrivals_lambda)
         
-        reason = ""
-        
-        # Override action logic based on safety rules during green phase
-        if self.phase in [0, 2]:
-            ns_queue = self.queues[0] + self.queues[1]
-            ew_queue = self.queues[2] + self.queues[3]
-            
-            # 1. Switch if the other direction queue is much larger
-            if self.phase == 0 and ew_queue > ns_queue + 10:
-                action = 1
-                reason = "Forced: E/W Queue is much larger"
-            elif self.phase == 2 and ns_queue > ew_queue + 10:
-                action = 1
-                reason = "Forced: N/S Queue is much larger"
-                
-            # 2. Maximum green time (50 steps) to force switching
-            if self.time_in_phase >= 50 and action == 0:
-                action = 1
-                reason = "Forced: Max Green Time (50 steps)"
-
-        # Prevent erratic switching: Enforce a minimum green time of 3 steps
-        if action == 1 and self.phase in [0, 2] and self.time_in_phase < 3:
-            action = 0
-            reason = "" # Min time takes precedence
-
         # Enable a capacity large enough to prevent the queues from exploding infinitely under traffic
         max_dep = 5 
         
@@ -96,14 +71,10 @@ class IntersectionEnv:
         self.queues -= departures
         self.queues = np.clip(self.queues, 0, 50)
         
-        # Calculate Reward based on REAL queues. 
-        # This gives the agent a gradient to clear queues even when they exceed the 
-        # State Representation threshold limit (5), resolving the "stuck" blind-spot.
-        reward = -np.sum(self.queues) / (4.0 * self.max_queue)
+        # Calculate Reward strictly on formalization
+        discretized_queues = np.clip(self.queues, 0, self.max_queue)
+        reward = -float(np.sum(discretized_queues))
         
-        # Explicit penalty for switching to discourage extremely high frequency phase changes
-        if action == 1 and self.phase in [1, 3] and self.time_in_phase == 0:
-            reward -= 0.5
-            
+        reason = ""
         info = {'reason': reason}
         return self._get_state(), reward, False, info

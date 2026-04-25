@@ -21,7 +21,7 @@ def run_visualization(steps=200, interval=1000):
         q_table = pickle.load(f)
         
     # 2. Setup Environment and Agent using Balanced Traffic settings
-    env = IntersectionEnv(arrivals_lambda=(1.5, 1.5, 1.5, 1.5))
+    env = IntersectionEnv(arrivals_lambda=(0.4, 0.4, 0.4, 0.4))
     agent = QLearningAgent(epsilon=0.0) # Greedy deterministic policy (Exploitation)
     agent.q_table = q_table
     

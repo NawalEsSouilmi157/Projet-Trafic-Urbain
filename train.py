@@ -5,13 +5,13 @@ import os
 from intersection_sim import IntersectionEnv
 from agent import QLearningAgent
 
-def train(episodes=5000, steps_per_episode=150):
+def train(episodes=5000, steps_per_episode=200):
     print("Starting Q-Learning Training...")
     # Initialize environment with balanced traffic arrivals
-    env = IntersectionEnv(arrivals_lambda=(1.5, 1.5, 1.5, 1.5))
+    env = IntersectionEnv(arrivals_lambda=(0.4, 0.4, 0.4, 0.4))
     
     # Initialize Q-Learning agent with tuned hyperparameters
-    agent = QLearningAgent(alpha=0.3, gamma=0.95, epsilon=1.0, epsilon_decay=0.999)
+    agent = QLearningAgent(alpha=0.1, gamma=0.95, epsilon=1.0, epsilon_decay=0.9995)
     
     rewards_history = []
     
@@ -38,6 +38,9 @@ def train(episodes=5000, steps_per_episode=150):
         
         if (ep + 1) % 100 == 0:
             print(f"Episode {ep + 1}/{episodes} - Reward: {episode_reward:.2f} - Epsilon: {agent.epsilon:.3f}")
+            if (ep + 1) % 1000 == 0:
+                unique_states = len(set([k[0] for k in agent.q_table.keys()]))
+                print(f">>> Discovered Unique States: {unique_states}")
             
     # Calculate a moving average for smoothing the curve
     window = 50
